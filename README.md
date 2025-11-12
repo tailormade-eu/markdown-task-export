@@ -22,7 +22,7 @@ Perfect for consultants and project managers who track work in Markdown and need
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/markdown-task-export.git
+git clone https://github.com/tailormade-eu/markdown-task-export.git
 cd markdown-task-export
 
 # Build
@@ -258,7 +258,7 @@ dotnet test
 
 ## Related Projects
 
-- **[obsidian-task-export-plugin](https://github.com/yourusername/obsidian-task-export-plugin)** - Obsidian plugin version with auto-export
+- **[obsidian-task-export-plugin](https://github.com/tailormade-eu/obsidian-task-export-plugin)** - Obsidian plugin version with auto-export
 
 ## License
 
@@ -270,6 +270,6 @@ Created for personal use in managing customer project tasks and time tracking in
 
 ## Support
 
-- 🐛 **Issues**: [Report a bug](https://github.com/yourusername/markdown-task-export/issues)
-- 💬 **Discussions**: [Ask a question](https://github.com/yourusername/markdown-task-export/discussions)
+- 🐛 **Issues**: [Report a bug](https://github.com/tailormade-eu/markdown-task-export/issues)
+- 💬 **Discussions**: [Ask a question](https://github.com/tailormade-eu/markdown-task-export/discussions)
 - ⭐ **Star** the repo if you find it useful!
