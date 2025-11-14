@@ -31,6 +31,8 @@ try
     Log.Information("Markdown Task Export Tool");
     Log.Information("Input: {Input}", options.InputPath);
     Log.Information("Output: {Output}", options.OutputPath);
+    Log.Information("Compress Levels: {CompressLevels}", options.CompressLevels);
+    Log.Information("Include Header: {IncludeHeader}", options.IncludeHeader);
     Log.Information("");
 
     // Validate input path

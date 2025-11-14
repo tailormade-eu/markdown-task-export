@@ -46,19 +46,13 @@ public class CsvExporter
             if (compressLevels)
             {
                 // Compressed mode: only output non-empty levels, skipping empty slots
-                foreach (var level in task.Levels)
-                {
-                    if (!string.IsNullOrEmpty(level))
-                    {
-                        csv.Append(',');
-                        csv.Append(EscapeField(level));
-                    }
-                }
-                // Fill remaining columns with empty values to maintain consistent column count
-                var nonEmptyCount = task.Levels.Count(l => !string.IsNullOrEmpty(l));
-                for (int i = nonEmptyCount; i < maxLevelDepth; i++)
+                var nonEmptyLevels = task.Levels.Where(l => !string.IsNullOrEmpty(l)).ToList();
+                
+                // Output non-empty levels (no padding needed - each row can have different column count)
+                foreach (var level in nonEmptyLevels)
                 {
                     csv.Append(',');
+                    csv.Append(EscapeField(level));
                 }
             }
             else
