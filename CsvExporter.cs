@@ -11,25 +11,30 @@ public class CsvExporter
     /// <summary>
     /// Exports tasks to a CSV file with UTF-8 BOM encoding.
     /// </summary>
-    public void Export(List<TaskItem> tasks, string outputPath)
+    public void Export(List<TaskItem> tasks, string outputPath, bool compressLevels = false, bool includeHeader = true)
     {
         if (tasks.Count == 0)
         {
             throw new InvalidOperationException("No tasks to export");
         }
 
-        // Determine the maximum header depth needed
-        int maxHeaderDepth = DetermineMaxHeaderDepth(tasks);
+        // Determine the maximum level depth based on compression mode
+        int maxLevelDepth = compressLevels 
+            ? DetermineMaxCompressedLevelDepth(tasks) 
+            : DetermineMaxLevelDepth(tasks);
 
         var csv = new StringBuilder();
         
-        // Build header row based on max header depth
-        csv.Append("CustomerName,ProjectName");
-        for (int i = 1; i <= maxHeaderDepth; i++)
+        // Build header row based on max level depth
+        if (includeHeader)
         {
-            csv.Append($",Header{i}");
+            csv.Append("CustomerName,ProjectName");
+            for (int i = 1; i <= maxLevelDepth; i++)
+            {
+                csv.Append($",Level{i}");
+            }
+            csv.AppendLine(",Task");
         }
-        csv.AppendLine(",Task");
 
         // Write data rows
         foreach (var task in tasks)
@@ -38,14 +43,34 @@ public class CsvExporter
             csv.Append(',');
             csv.Append(EscapeField(task.ProjectName));
             
-            // Only include headers that have values
-            var headers = GetNonEmptyHeaders(task);
-            for (int i = 0; i < maxHeaderDepth; i++)
+            if (compressLevels)
             {
-                csv.Append(',');
-                if (i < headers.Count)
+                // Compressed mode: only output non-empty levels, skipping empty slots
+                foreach (var level in task.Levels)
                 {
-                    csv.Append(EscapeField(headers[i]));
+                    if (!string.IsNullOrEmpty(level))
+                    {
+                        csv.Append(',');
+                        csv.Append(EscapeField(level));
+                    }
+                }
+                // Fill remaining columns with empty values to maintain consistent column count
+                var nonEmptyCount = task.Levels.Count(l => !string.IsNullOrEmpty(l));
+                for (int i = nonEmptyCount; i < maxLevelDepth; i++)
+                {
+                    csv.Append(',');
+                }
+            }
+            else
+            {
+                // Non-compressed mode: output all levels including empty slots to preserve hierarchy
+                for (int i = 0; i < maxLevelDepth; i++)
+                {
+                    csv.Append(',');
+                    if (i < task.Levels.Count)
+                    {
+                        csv.Append(EscapeField(task.Levels[i]));
+                    }
                 }
             }
             
@@ -60,43 +85,36 @@ public class CsvExporter
     }
 
     /// <summary>
-    /// Determines the maximum header depth across all tasks.
+    /// Determines the maximum level depth across all tasks (includes empty slots).
     /// </summary>
-    private int DetermineMaxHeaderDepth(List<TaskItem> tasks)
+    private int DetermineMaxLevelDepth(List<TaskItem> tasks)
     {
         int maxDepth = 0;
         
         foreach (var task in tasks)
         {
-            int depth = 0;
-            if (!string.IsNullOrEmpty(task.Header1)) depth = 1;
-            if (!string.IsNullOrEmpty(task.Header2)) depth = 2;
-            if (!string.IsNullOrEmpty(task.Header3)) depth = 3;
-            
-            if (depth > maxDepth)
-                maxDepth = depth;
+            if (task.Levels.Count > maxDepth)
+                maxDepth = task.Levels.Count;
         }
         
         return maxDepth;
     }
 
     /// <summary>
-    /// Gets non-empty headers from a task item in order.
+    /// Determines the maximum number of non-empty levels across all tasks.
     /// </summary>
-    private List<string> GetNonEmptyHeaders(TaskItem task)
+    private int DetermineMaxCompressedLevelDepth(List<TaskItem> tasks)
     {
-        var headers = new List<string>();
+        int maxDepth = 0;
         
-        if (!string.IsNullOrEmpty(task.Header1))
-            headers.Add(task.Header1);
+        foreach (var task in tasks)
+        {
+            int nonEmptyCount = task.Levels.Count(l => !string.IsNullOrEmpty(l));
+            if (nonEmptyCount > maxDepth)
+                maxDepth = nonEmptyCount;
+        }
         
-        if (!string.IsNullOrEmpty(task.Header2))
-            headers.Add(task.Header2);
-        
-        if (!string.IsNullOrEmpty(task.Header3))
-            headers.Add(task.Header3);
-        
-        return headers;
+        return maxDepth;
     }
 
     /// <summary>
