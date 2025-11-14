@@ -130,6 +130,7 @@ static ExportOptions? ParseArguments(string[] args)
             
             case "--version":
                 Console.WriteLine("Markdown Task Export v1.0.0");
+                Console.WriteLine("Repository: https://github.com/tailormade-eu/markdown-task-export");
                 Environment.Exit(0);
                 break;
         }
@@ -180,6 +181,7 @@ static List<string> CleanAndSplitArguments(string[] args)
 static void ShowHelp()
 {
     Console.WriteLine("Markdown Task Export Tool");
+    Console.WriteLine("Repository: https://github.com/tailormade-eu/markdown-task-export");
     Console.WriteLine();
     Console.WriteLine("Usage:");
     Console.WriteLine("  MarkdownTaskExport -i <input-path> [-o <output-path>] [-v]");
