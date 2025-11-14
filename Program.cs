@@ -81,23 +81,41 @@ static ExportOptions? ParseArguments(string[] args)
 {
     var options = new ExportOptions();
     
-    for (int i = 0; i < args.Length; i++)
+    // Handle PowerShell's escaped quote issue by re-splitting arguments if needed
+    var cleanedArgs = CleanAndSplitArguments(args);
+    
+    for (int i = 0; i < cleanedArgs.Count; i++)
     {
-        switch (args[i])
+        switch (cleanedArgs[i])
         {
             case "-i":
             case "--input":
-                if (i + 1 < args.Length)
+                if (i + 1 < cleanedArgs.Count)
                 {
-                    options.InputPath = args[++i];
+                    options.InputPath = cleanedArgs[++i];
                 }
                 break;
             
             case "-o":
             case "--output":
-                if (i + 1 < args.Length)
+                if (i + 1 < cleanedArgs.Count)
                 {
-                    options.OutputPath = args[++i];
+                    var outputArg = cleanedArgs[++i];
+                    
+                    // Check if output is a directory - if so, append default filename
+                    if (Directory.Exists(outputArg))
+                    {
+                        options.OutputPath = Path.Combine(outputArg, "outstanding_tasks.csv");
+                    }
+                    else if (!outputArg.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // If it's not a .csv file, treat it as a directory and append default filename
+                        options.OutputPath = Path.Combine(outputArg, "outstanding_tasks.csv");
+                    }
+                    else
+                    {
+                        options.OutputPath = outputArg;
+                    }
                 }
                 break;
             
@@ -124,6 +142,39 @@ static ExportOptions? ParseArguments(string[] args)
     }
     
     return options;
+}
+
+static List<string> CleanAndSplitArguments(string[] args)
+{
+    var result = new List<string>();
+    
+    foreach (var arg in args)
+    {
+        // Check if this argument contains an escaped quote followed by a flag
+        // Pattern: ends with " followed by space and a flag like -o, -i, etc.
+        var pattern = @"^(.+?)\""\s+(-[iovh]|--\w+)(.*)$";
+        var match = System.Text.RegularExpressions.Regex.Match(arg, pattern);
+        
+        if (match.Success)
+        {
+            // Split this malformed argument
+            result.Add(match.Groups[1].Value.Trim('"')); // The path without trailing quote
+            result.Add(match.Groups[2].Value); // The flag (-o, -i, etc.)
+            
+            // If there's more after the flag, add it too
+            if (!string.IsNullOrWhiteSpace(match.Groups[3].Value))
+            {
+                result.Add(match.Groups[3].Value.Trim().Trim('"'));
+            }
+        }
+        else
+        {
+            // Normal argument, just clean quotes
+            result.Add(arg.Trim('"'));
+        }
+    }
+    
+    return result;
 }
 
 static void ShowHelp()

@@ -83,3 +83,11 @@ This is a simple console application that extracts tasks from Markdown files. Ke
 - **FluentResults** - Use for error handling instead of exceptions
 - **Simple file I/O** - Use standard .NET file operations
 - **CSV generation** - Manual CSV writing with proper escaping (no heavy libraries)
+
+### Command-Line Argument Handling
+
+When processing command-line arguments for file paths:
+- **Always strip quotes** - Path arguments may have leading/trailing quotes that need to be removed
+- **Handle escaped quotes** - PowerShell/Windows escapes trailing backslashes before quotes (e.g., `"C:\Path\"` becomes `C:\Path"`)
+- **Clean all path arguments** - Use `Trim('"')` or similar to remove quotes from path values
+- **Example**: `"C:\Users\Path\"` may be parsed as `C:\Users\Path" -o` due to escaped quote - clean this before using
