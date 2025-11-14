@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tailormade", "Tailormade", "{C484B1D7-9459-0CCC-9B1F-2A053B94875F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{30B20F3E-466C-3CDE-43B8-031CB080EF47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownTaskExport", "src\MarkdownTaskExport.csproj", "{9C82095A-ABF0-1D9A-0C69-A32806849384}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C82095A-ABF0-1D9A-0C69-A32806849384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C82095A-ABF0-1D9A-0C69-A32806849384}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C82095A-ABF0-1D9A-0C69-A32806849384}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C82095A-ABF0-1D9A-0C69-A32806849384}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{30B20F3E-466C-3CDE-43B8-031CB080EF47} = {C484B1D7-9459-0CCC-9B1F-2A053B94875F}
+		{9C82095A-ABF0-1D9A-0C69-A32806849384} = {30B20F3E-466C-3CDE-43B8-031CB080EF47}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8A06DC2-8857-4E3B-B6B3-D2DE2392B4D4}
+	EndGlobalSection
+EndGlobal
