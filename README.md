@@ -274,13 +274,30 @@ dotnet test
 
 ## Roadmap
 
-- [ ] Configuration file support (JSON/YAML)
+- [x] Configuration file support (JSON/YAML)
+- [x] Configurable CSV delimiter (comma/semicolon)
 - [ ] Filter tasks by date range
 - [ ] Support custom task patterns (beyond `- [ ]`)
 - [ ] Export statistics and summary
 - [ ] Watch mode for continuous export
 - [ ] GUI wrapper for non-technical users
 - [ ] Docker image
+
+## Changelog
+
+### v1.0.1 (2025-11-14)
+- ✨ Added configurable CSV delimiter (comma or semicolon)
+- ✨ Added `-d/--delimiter` command-line option
+- 🌍 Improved Excel compatibility for European locales
+- 📝 Updated documentation with delimiter examples
+
+### v1.0.0 (2025-11-11)
+- 🎉 Initial release
+- ✅ Task extraction from markdown files
+- ✅ Hierarchical header parsing
+- ✅ CSV export with compression mode
+- ✅ Customer/Project detection
+- ✅ Command-line interface
 
 ## Related Projects
 

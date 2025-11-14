@@ -154,7 +154,7 @@ static ExportOptions? ParseArguments(string[] args)
                 return null;
             
             case "--version":
-                Console.WriteLine("Markdown Task Export v1.0.0");
+                Console.WriteLine("Markdown Task Export v1.0.1");
                 Console.WriteLine("Repository: https://github.com/tailormade-eu/markdown-task-export");
                 Environment.Exit(0);
                 break;
