@@ -12,7 +12,10 @@ Perfect for consultants and project managers who track work in Markdown and need
 
 - 📁 **Recursive Folder Scanning** - Traverses customer directory structure
 - ✅ **Task Extraction** - Finds all unchecked tasks (`- [ ]`)
-- 🏗️ **Hierarchical Context** - Maintains header structure (up to 3 levels)
+- 🏗️ **Hierarchical Context** - Maintains header structure (unlimited depth)
+- 📊 **Dynamic Levels** - Supports headers at any depth (Level1, Level2, Level3, ...)
+- 🗜️ **Compression Mode** - Optional removal of empty hierarchy columns
+- 📋 **Header Control** - Include or exclude CSV header row
 - 👥 **Customer/Project Detection** - Extracts names from folder structure
 - 📊 **CSV Export** - ManicTime-compatible format
 - 🔤 **Smart Escaping** - Handles commas, quotes, special characters
@@ -80,6 +83,8 @@ Options:
   -i, --input <path>     Path to Customers folder (required)
   -o, --output <path>    Output CSV file path (default: outstanding_tasks.csv)
   -v, --verbose          Show detailed processing information
+  --compress-levels      Compress empty levels (skip empty hierarchy columns)
+  --no-header            Exclude CSV header row
   -h, --help             Show help information
   --version              Show version information
 ```
@@ -95,6 +100,15 @@ dotnet run -- -i "./Customers" -o "C:\Reports\tasks_2025.csv"
 
 # Verbose mode for debugging
 dotnet run -- -i "./Customers" -v
+
+# Compress empty hierarchy levels
+dotnet run -- -i "./Customers" -o "tasks.csv" --compress-levels
+
+# Export without header row
+dotnet run -- -i "./Customers" -o "tasks.csv" --no-header
+
+# Combine options
+dotnet run -- -i "./Customers" -v --compress-levels --no-header
 
 # Using published executable
 ./TaskExport -i "./Customers" -o "tasks.csv"
@@ -143,19 +157,23 @@ Uses standard Markdown task checkboxes:
 ### CSV Structure
 
 ```csv
-CustomerName,ProjectName,Header1,Header2,Header3,Task
-Customer A,Project 1,Main Section,Outstanding task to do
-Customer A,Project 1,Main Section,Subsection,Task under subsection
-Customer A,Project 1,Main Section,Subsection,Nested sub-task
-Customer A,Project 1,Main Section,Subsection,Deep Section (Header3),Task at third header level
+CustomerName,ProjectName,Level1,Level2,Task
+Customer A,Project 1,,Main Section,Outstanding task to do
+Customer A,Project 1,,Main Section,Subsection,Task under subsection
+Customer A,Project 1,,Main Section,Subsection,Nested sub-task
+Customer A,Project 1,,Main Section,Subsection,Deep Section (Header3),Task at third header level
 ```
+
+**Note:** Column names changed from `Header1,Header2,Header3` to `Level1,Level2,Level3,...` to support unlimited depth.
 
 ### Key Features
 
-- **Dynamic Columns**: Only includes header columns that have values (no empty trailing commas)
+- **Dynamic Columns**: Automatically adapts to the maximum header depth in your files
+- **Compression Mode**: Use `--compress-levels` to remove empty hierarchy columns
+- **Header Control**: Use `--no-header` to exclude the CSV header row
 - **Proper CSV Escaping**: Handles commas, quotes, newlines in task descriptions
 - **UTF-8 with BOM**: Ensures Excel compatibility
-- **Hierarchical Structure**: Preserves up to 3 levels of markdown headers
+- **Hierarchical Structure**: Preserves unlimited levels of markdown headers
 
 ## Use Cases
 
