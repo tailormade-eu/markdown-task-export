@@ -56,7 +56,7 @@ try
     try
     {
         var exporter = new CsvExporter();
-        exporter.Export(tasks, options.OutputPath);
+        exporter.Export(tasks, options.OutputPath, options.CompressLevels, options.IncludeHeader);
         
         Log.Information("Successfully exported to: {Output}", options.OutputPath);
         return 0;
@@ -124,6 +124,14 @@ static ExportOptions? ParseArguments(string[] args)
                 options.Verbose = true;
                 break;
             
+            case "--compress-levels":
+                options.CompressLevels = true;
+                break;
+            
+            case "--no-header":
+                options.IncludeHeader = false;
+                break;
+            
             case "-h":
             case "--help":
                 return null;
@@ -184,16 +192,19 @@ static void ShowHelp()
     Console.WriteLine("Repository: https://github.com/tailormade-eu/markdown-task-export");
     Console.WriteLine();
     Console.WriteLine("Usage:");
-    Console.WriteLine("  MarkdownTaskExport -i <input-path> [-o <output-path>] [-v]");
+    Console.WriteLine("  MarkdownTaskExport -i <input-path> [-o <output-path>] [options]");
     Console.WriteLine();
     Console.WriteLine("Options:");
     Console.WriteLine("  -i, --input <path>     Path to Customers folder (required)");
     Console.WriteLine("  -o, --output <path>    Output CSV file path (default: outstanding_tasks.csv)");
     Console.WriteLine("  -v, --verbose          Show detailed processing information");
+    Console.WriteLine("  --compress-levels      Compress empty levels (skip empty hierarchy columns)");
+    Console.WriteLine("  --no-header            Exclude CSV header row");
     Console.WriteLine("  -h, --help             Show help information");
     Console.WriteLine("  --version              Show version information");
     Console.WriteLine();
     Console.WriteLine("Example:");
     Console.WriteLine("  MarkdownTaskExport -i ./Customers -o tasks.csv");
-    Console.WriteLine("  MarkdownTaskExport -i \"C:\\Projects\\Customers\" -v");
+    Console.WriteLine("  MarkdownTaskExport -i \"C:\\Projects\\Customers\" -v --compress-levels");
+    Console.WriteLine("  MarkdownTaskExport -i ./Customers --no-header");
 }

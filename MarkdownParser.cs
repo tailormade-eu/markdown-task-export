@@ -8,7 +8,7 @@ namespace MarkdownTaskExport;
 /// </summary>
 public class MarkdownParser
 {
-    private static readonly Regex HeaderRegex = new(@"^(#{2,4})\s+(.+)$", RegexOptions.Compiled);
+    private static readonly Regex HeaderRegex = new(@"^(#{2,})\s+(.+)$", RegexOptions.Compiled);
     private static readonly Regex TaskRegex = new(@"^(\s*)-\s+\[([ ])\]\s+(.+)$", RegexOptions.Compiled);
     private static readonly Regex CompletedTaskRegex = new(@"^(\s*)-\s+\[(x|X)\]", RegexOptions.Compiled);
     private static readonly Regex CheckmarkRegex = new(@"✅\s+\d{4}-\d{2}-\d{2}", RegexOptions.Compiled);
@@ -21,9 +21,8 @@ public class MarkdownParser
         var tasks = new List<TaskItem>();
         var lines = File.ReadAllLines(filePath);
         
-        string header1 = string.Empty;
-        string header2 = string.Empty;
-        string header3 = string.Empty;
+        // Use a list to track headers at any depth (0-indexed, where 0 is ##, 1 is ###, etc.)
+        var headers = new List<string>();
         
         // Track parent tasks for nested structure
         var parentTaskStack = new Stack<(int indentLevel, string taskText)>();
@@ -32,27 +31,26 @@ public class MarkdownParser
         {
             var line = lines[i];
             
-            // Check for headers (##, ###, ####)
+            // Check for headers (##, ###, ####, etc.)
             var headerMatch = HeaderRegex.Match(line);
             if (headerMatch.Success)
             {
-                var headerLevel = headerMatch.Groups[1].Value.Length;
+                var headerLevel = headerMatch.Groups[1].Value.Length - 1; // Subtract 1 because ## is level 1 (index 0)
                 var headerText = headerMatch.Groups[2].Value.Trim();
                 
-                switch (headerLevel)
+                // Ensure the headers list is large enough
+                while (headers.Count <= headerLevel)
                 {
-                    case 2: // ##
-                        header1 = headerText;
-                        header2 = string.Empty;
-                        header3 = string.Empty;
-                        break;
-                    case 3: // ###
-                        header2 = headerText;
-                        header3 = string.Empty;
-                        break;
-                    case 4: // ####
-                        header3 = headerText;
-                        break;
+                    headers.Add(string.Empty);
+                }
+                
+                // Set this header level
+                headers[headerLevel] = headerText;
+                
+                // Clear any deeper levels
+                for (int j = headerLevel + 1; j < headers.Count; j++)
+                {
+                    headers[j] = string.Empty;
                 }
                 
                 // Clear parent task stack when we hit a new header
@@ -105,38 +103,23 @@ public class MarkdownParser
                         Task = taskText
                     };
                     
-                    // Apply headers based on nesting level
-                    if (parentTaskStack.Count == 0)
+                    // Add document headers - keep all levels including empty ones for proper structure
+                    var levels = new List<string>();
+                    
+                    // Copy all header levels (including empty ones) to preserve hierarchy
+                    levels.AddRange(headers);
+                    
+                    // Add parent task levels
+                    if (parentTaskStack.Count > 0)
                     {
-                        // No parent tasks, use document headers
-                        task.Header1 = header1;
-                        task.Header2 = header2;
-                        task.Header3 = header3;
-                    }
-                    else if (parentTaskStack.Count == 1)
-                    {
-                        // One parent task
-                        task.Header1 = header1;
-                        task.Header2 = string.IsNullOrEmpty(header2) ? parentTaskStack.Peek().taskText : header2;
-                        task.Header3 = string.IsNullOrEmpty(header2) ? string.Empty : parentTaskStack.Peek().taskText;
-                    }
-                    else if (parentTaskStack.Count == 2)
-                    {
-                        // Two parent tasks
-                        var parents = parentTaskStack.ToArray();
-                        task.Header1 = header1;
-                        task.Header2 = string.IsNullOrEmpty(header2) ? parents[1].taskText : header2;
-                        task.Header3 = string.IsNullOrEmpty(header2) ? parents[0].taskText : (string.IsNullOrEmpty(header3) ? parents[1].taskText : header3);
-                    }
-                    else
-                    {
-                        // More than two parent tasks - take the last ones
-                        var parents = parentTaskStack.Take(3).Reverse().ToArray();
-                        task.Header1 = header1;
-                        task.Header2 = string.IsNullOrEmpty(header2) ? (parents.Length > 1 ? parents[1].taskText : parents[0].taskText) : header2;
-                        task.Header3 = string.IsNullOrEmpty(header2) ? parents[0].taskText : (string.IsNullOrEmpty(header3) ? (parents.Length > 0 ? parents[0].taskText : string.Empty) : header3);
+                        var parents = parentTaskStack.Reverse().ToList();
+                        foreach (var parent in parents)
+                        {
+                            levels.Add(parent.taskText);
+                        }
                     }
                     
+                    task.Levels = levels;
                     tasks.Add(task);
                 }
             }
