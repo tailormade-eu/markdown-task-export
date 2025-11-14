@@ -10,4 +10,5 @@ public class ExportOptions
     public bool Verbose { get; set; }
     public bool CompressLevels { get; set; } = false;
     public bool IncludeHeader { get; set; } = true;
+    public char Delimiter { get; set; } = ',';
 }

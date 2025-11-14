@@ -8,6 +8,13 @@ namespace MarkdownTaskExport;
 /// </summary>
 public class CsvExporter
 {
+    private readonly char _delimiter;
+
+    public CsvExporter(char delimiter = ',')
+    {
+        _delimiter = delimiter;
+    }
+
     /// <summary>
     /// Exports tasks to a CSV file with UTF-8 BOM encoding.
     /// </summary>
@@ -28,19 +35,20 @@ public class CsvExporter
         // Build header row based on max level depth
         if (includeHeader)
         {
-            csv.Append("CustomerName,ProjectName");
+            csv.Append($"CustomerName{_delimiter}ProjectName");
             for (int i = 1; i <= maxLevelDepth; i++)
             {
-                csv.Append($",Level{i}");
+                csv.Append($"{_delimiter}Level{i}");
             }
-            csv.AppendLine(",Task");
+            csv.Append($"{_delimiter}Task");
+            csv.AppendLine();
         }
 
         // Write data rows
         foreach (var task in tasks)
         {
             csv.Append(EscapeField(task.CustomerName));
-            csv.Append(',');
+            csv.Append(_delimiter);
             csv.Append(EscapeField(task.ProjectName));
             
             if (compressLevels)
@@ -51,7 +59,7 @@ public class CsvExporter
                 // Output non-empty levels (no padding needed - each row can have different column count)
                 foreach (var level in nonEmptyLevels)
                 {
-                    csv.Append(',');
+                    csv.Append(_delimiter);
                     csv.Append(EscapeField(level));
                 }
             }
@@ -60,7 +68,7 @@ public class CsvExporter
                 // Non-compressed mode: output all levels including empty slots to preserve hierarchy
                 for (int i = 0; i < maxLevelDepth; i++)
                 {
-                    csv.Append(',');
+                    csv.Append(_delimiter);
                     if (i < task.Levels.Count)
                     {
                         csv.Append(EscapeField(task.Levels[i]));
@@ -68,7 +76,7 @@ public class CsvExporter
                 }
             }
             
-            csv.Append(',');
+            csv.Append(_delimiter);
             csv.Append(EscapeField(task.Task));
             csv.AppendLine();
         }
@@ -113,7 +121,7 @@ public class CsvExporter
 
     /// <summary>
     /// Escapes a CSV field according to RFC 4180.
-    /// - Wraps in quotes if contains comma, newline, or quote
+    /// - Wraps in quotes if contains delimiter, newline, or quote
     /// - Doubles any quotes inside the field
     /// </summary>
     private string EscapeField(string field)
@@ -122,7 +130,7 @@ public class CsvExporter
             return string.Empty;
 
         // Check if escaping is needed
-        bool needsQuotes = field.Contains(',') || field.Contains('"') || field.Contains('\n') || field.Contains('\r');
+        bool needsQuotes = field.Contains(_delimiter) || field.Contains('"') || field.Contains('\n') || field.Contains('\r');
 
         if (needsQuotes)
         {

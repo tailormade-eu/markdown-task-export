@@ -16,6 +16,7 @@ Perfect for consultants and project managers who track work in Markdown and need
 - 📊 **Dynamic Levels** - Supports headers at any depth (Level1, Level2, Level3, ...)
 - 🗜️ **Compression Mode** - Optional removal of empty hierarchy columns
 - 📋 **Header Control** - Include or exclude CSV header row
+- 🔣 **Configurable Delimiter** - Choose comma or semicolon delimiter
 - 👥 **Customer/Project Detection** - Extracts names from folder structure
 - 📊 **CSV Export** - ManicTime-compatible format
 - 🔤 **Smart Escaping** - Handles commas, quotes, special characters
@@ -80,13 +81,14 @@ dotnet run -- --input "./Customers" --output "outstanding_tasks.csv"
 
 ```
 Options:
-  -i, --input <path>     Path to Customers folder (required)
-  -o, --output <path>    Output CSV file path (default: outstanding_tasks.csv)
-  -v, --verbose          Show detailed processing information
-  --compress-levels      Compress empty levels (skip empty hierarchy columns)
-  --no-header            Exclude CSV header row
-  -h, --help             Show help information
-  --version              Show version information
+  -i, --input <path>       Path to Customers folder (required)
+  -o, --output <path>      Output CSV file path (default: outstanding_tasks.csv)
+  -d, --delimiter <value>  CSV delimiter: 'comma' or 'semicolon' (default: comma)
+  -v, --verbose            Show detailed processing information
+  --compress-levels        Compress empty levels (skip empty hierarchy columns)
+  --no-header              Exclude CSV header row
+  -h, --help               Show help information
+  --version                Show version information
 ```
 
 ### Examples
@@ -106,6 +108,12 @@ dotnet run -- -i "./Customers" -o "tasks.csv" --compress-levels
 
 # Export without header row
 dotnet run -- -i "./Customers" -o "tasks.csv" --no-header
+
+# Use semicolon delimiter for Excel in some regions
+dotnet run -- -i "./Customers" -o "tasks.csv" --delimiter semicolon
+
+# Use semicolon with short flag
+dotnet run -- -i "./Customers" -d ";" 
 
 # Combine options
 dotnet run -- -i "./Customers" -v --compress-levels --no-header

@@ -31,6 +31,7 @@ try
     Log.Information("Markdown Task Export Tool");
     Log.Information("Input: {Input}", options.InputPath);
     Log.Information("Output: {Output}", options.OutputPath);
+    Log.Information("Delimiter: {Delimiter}", options.Delimiter == ',' ? "Comma" : "Semicolon");
     Log.Information("Compress Levels: {CompressLevels}", options.CompressLevels);
     Log.Information("Include Header: {IncludeHeader}", options.IncludeHeader);
     Log.Information("");
@@ -57,7 +58,7 @@ try
     // Export to CSV
     try
     {
-        var exporter = new CsvExporter();
+        var exporter = new CsvExporter(options.Delimiter);
         exporter.Export(tasks, options.OutputPath, options.CompressLevels, options.IncludeHeader);
         
         Log.Information("Successfully exported to: {Output}", options.OutputPath);
@@ -134,6 +135,20 @@ static ExportOptions? ParseArguments(string[] args)
                 options.IncludeHeader = false;
                 break;
             
+            case "-d":
+            case "--delimiter":
+                if (i + 1 < cleanedArgs.Count)
+                {
+                    var delimiterArg = cleanedArgs[++i].ToLower();
+                    options.Delimiter = delimiterArg switch
+                    {
+                        "comma" or "," => ',',
+                        "semicolon" or ";" => ';',
+                        _ => throw new ArgumentException($"Invalid delimiter: {delimiterArg}. Use 'comma' or 'semicolon'.")
+                    };
+                }
+                break;
+            
             case "-h":
             case "--help":
                 return null;
@@ -197,16 +212,18 @@ static void ShowHelp()
     Console.WriteLine("  MarkdownTaskExport -i <input-path> [-o <output-path>] [options]");
     Console.WriteLine();
     Console.WriteLine("Options:");
-    Console.WriteLine("  -i, --input <path>     Path to Customers folder (required)");
-    Console.WriteLine("  -o, --output <path>    Output CSV file path (default: outstanding_tasks.csv)");
-    Console.WriteLine("  -v, --verbose          Show detailed processing information");
-    Console.WriteLine("  --compress-levels      Compress empty levels (skip empty hierarchy columns)");
-    Console.WriteLine("  --no-header            Exclude CSV header row");
-    Console.WriteLine("  -h, --help             Show help information");
-    Console.WriteLine("  --version              Show version information");
+    Console.WriteLine("  -i, --input <path>       Path to Customers folder (required)");
+    Console.WriteLine("  -o, --output <path>      Output CSV file path (default: outstanding_tasks.csv)");
+    Console.WriteLine("  -d, --delimiter <value>  CSV delimiter: 'comma' or 'semicolon' (default: comma)");
+    Console.WriteLine("  -v, --verbose            Show detailed processing information");
+    Console.WriteLine("  --compress-levels        Compress empty levels (skip empty hierarchy columns)");
+    Console.WriteLine("  --no-header              Exclude CSV header row");
+    Console.WriteLine("  -h, --help               Show help information");
+    Console.WriteLine("  --version                Show version information");
     Console.WriteLine();
     Console.WriteLine("Example:");
     Console.WriteLine("  MarkdownTaskExport -i ./Customers -o tasks.csv");
     Console.WriteLine("  MarkdownTaskExport -i \"C:\\Projects\\Customers\" -v --compress-levels");
+    Console.WriteLine("  MarkdownTaskExport -i ./Customers --delimiter semicolon");
     Console.WriteLine("  MarkdownTaskExport -i ./Customers --no-header");
 }
