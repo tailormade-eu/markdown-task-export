@@ -3,6 +3,8 @@ using MarkdownTaskExport.Models;
 using Serilog;
 using Serilog.Events;
 
+// dotnet run --project "c:\Users\JaRa\OneDrive\OneSyncFiles\ObsidianVault\Tailormade\Projects\markdown-task-export\src\MarkdownTaskExport.csproj" -i "c:\Users\JaRa\OneDrive\OneSyncFiles\ObsidianVault\Customers" -o c:\temp\test.csv --compress-levels
+
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
