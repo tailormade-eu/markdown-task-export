@@ -16,7 +16,7 @@ public class MarkdownParser
     /// <summary>
     /// Parses a markdown file and extracts all outstanding tasks.
     /// </summary>
-    public List<TaskItem> ParseFile(string filePath, string customerName, string projectName)
+    public List<TaskItem> ParseFile(string filePath, List<string> folderLevels, string projectName)
     {
         var tasks = new List<TaskItem>();
         var lines = File.ReadAllLines(filePath);
@@ -98,13 +98,22 @@ public class MarkdownParser
                     // Build the task item with proper header hierarchy
                     var task = new TaskItem
                     {
-                        CustomerName = customerName,
-                        ProjectName = projectName,
+                        CustomerName = folderLevels.FirstOrDefault() ?? string.Empty,
+                        ProjectName = string.Empty, // ProjectName is now part of Levels
                         Task = taskText
                     };
                     
-                    // Add document headers - keep all levels including empty ones for proper structure
+                    // Add folder levels first, then project name, then document headers - keep all levels including empty ones for proper structure
                     var levels = new List<string>();
+                    
+                    // Add folder hierarchy levels (excluding customer name)
+                    if (folderLevels.Count > 1)
+                    {
+                        levels.AddRange(folderLevels.Skip(1));
+                    }
+                    
+                    // Add project name as next level
+                    levels.Add(projectName);
                     
                     // Copy all header levels (including empty ones) to preserve hierarchy
                     levels.AddRange(headers);
