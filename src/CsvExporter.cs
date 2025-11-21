@@ -35,7 +35,7 @@ public class CsvExporter
         // Build header row based on max level depth
         if (includeHeader)
         {
-            csv.Append($"CustomerName{_delimiter}ProjectName");
+            csv.Append($"CustomerName");
             for (int i = 1; i <= maxLevelDepth; i++)
             {
                 csv.Append($"{_delimiter}Level{i}");
@@ -48,15 +48,13 @@ public class CsvExporter
         foreach (var task in tasks)
         {
             csv.Append(EscapeField(task.CustomerName));
-            csv.Append(_delimiter);
-            csv.Append(EscapeField(task.ProjectName));
             
             if (compressLevels)
             {
-                // Compressed mode: only output non-empty levels, skipping empty slots
+                // Compressed mode: only output non-empty levels, no padding - each row can have different column count
                 var nonEmptyLevels = task.Levels.Where(l => !string.IsNullOrEmpty(l)).ToList();
                 
-                // Output non-empty levels (no padding needed - each row can have different column count)
+                // Output non-empty levels only
                 foreach (var level in nonEmptyLevels)
                 {
                     csv.Append(_delimiter);
