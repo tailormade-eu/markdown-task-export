@@ -40,7 +40,8 @@ public class TaskExtractor
             if (customerName.StartsWith("."))
                 continue;
             
-            ProcessCustomerDirectory(customerDir, customerName, allTasks, verbose);
+            var folderLevels = new List<string> { customerName };
+            ProcessCustomerDirectory(customerDir, folderLevels, allTasks, verbose);
         }
         
         return allTasks;
@@ -49,7 +50,7 @@ public class TaskExtractor
     /// <summary>
     /// Processes a customer directory recursively to find all markdown files.
     /// </summary>
-    private void ProcessCustomerDirectory(string directory, string customerName, List<TaskItem> allTasks, bool verbose)
+    private void ProcessCustomerDirectory(string directory, List<string> folderLevels, List<TaskItem> allTasks, bool verbose)
     {
         try
         {
@@ -61,11 +62,11 @@ public class TaskExtractor
                 var projectName = Path.GetFileNameWithoutExtension(file);
                 
                 if (verbose)
-                    _logger.Information("Processing: {Customer} / {Project}", customerName, projectName);
+                    _logger.Information("Processing: {Customer} / {Project}", folderLevels.FirstOrDefault() ?? "Unknown", projectName);
                 
                 try
                 {
-                    var tasks = _parser.ParseFile(file, customerName, projectName);
+                    var tasks = _parser.ParseFile(file, folderLevels, projectName);
                     
                     if (tasks.Count > 0)
                     {
@@ -92,7 +93,8 @@ public class TaskExtractor
                 if (subdirName.StartsWith("."))
                     continue;
                 
-                ProcessCustomerDirectory(subdir, customerName, allTasks, verbose);
+                var newFolderLevels = new List<string>(folderLevels) { subdirName };
+                ProcessCustomerDirectory(subdir, newFolderLevels, allTasks, verbose);
             }
         }
         catch (Exception ex)
